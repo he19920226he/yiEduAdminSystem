@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @version:
+ * @Author: lxw
+ * @Date: 2019-11-05 11:10:56
+ * @LastEditors: lxw
+ * @LastEditTime: 2019-11-07 17:22:03
+ */
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 import util from '@/libs/util'

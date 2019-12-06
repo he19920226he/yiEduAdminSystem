@@ -4,11 +4,11 @@ import { Message } from 'element-ui'
 import util from '@/libs/util'
 
 // 创建一个错误
-function errorCreate (msg) {
-  const error = new Error(msg)
-  errorLog(error)
-  throw error
-}
+// function errorCreate (msg) {
+//   const error = new Error(msg)
+//   errorLog(error)
+//   throw error
+// }
 
 // 记录和显示错误
 function errorLog (error) {
@@ -36,6 +36,7 @@ function errorLog (error) {
 // 创建一个 axios 实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_API,
+  withCredentials: true,
   timeout: 5000 // 请求超时时间
 })
 
@@ -60,6 +61,7 @@ service.interceptors.response.use(
   response => {
     // dataAxios 是 axios 返回数据中的 data
     const dataAxios = response.data
+    console.log(dataAxios)
     // 这个状态码是和后端约定的
     const { code } = dataAxios
     // 根据 code 进行判断
@@ -69,17 +71,23 @@ service.interceptors.response.use(
     } else {
       // 有 code 代表这是一个后端接口 可以进行进一步的判断
       switch (code) {
-        case 0:
-          // [ 示例 ] code === 0 代表没有错误
-          return dataAxios.data
-        case 'xxx':
-          // [ 示例 ] 其它和后台约定的 code
-          errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
-          break
+        case 1028:
+          // code === 1028 代表没有错误
+          if (dataAxios.message !== '登录成功') {
+            Message({
+              message: dataAxios.message,
+              type: 'success'
+            })
+          }
+
+          return dataAxios
+        case 1224:
+          // code === 1224 代表没有错误
+          return dataAxios
         default:
-          // 不是正确的 code
-          errorCreate(`${dataAxios.msg}: ${response.config.url}`)
-          break
+          // 拦截状态码不是上面的情况的错误信息
+          errorLog({ message: dataAxios.message })
+          return Promise.reject(dataAxios)
       }
     }
   },
@@ -99,7 +107,9 @@ service.interceptors.response.use(
         case 505: error.message = 'HTTP版本不受支持'; break
         default: break
       }
+      error.message = '网络连接错误或服务器内部错误'
     }
+    error.message = '网络连接错误或服务器内部错误'
     errorLog(error)
     return Promise.reject(error)
   }

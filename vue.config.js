@@ -18,7 +18,16 @@ module.exports = {
   publicPath,
   lintOnSave: true,
   devServer: {
-    publicPath // 和 publicPath 保持一致
+    proxy: { // http://localhost:8088/
+      '/': {
+        target: 'http://localhost:8088',
+        ws: true,
+        changeOrigin: true
+        // pathRewrite: {
+        //   '^/api': ''
+        // }
+      }
+    }// 和 publicPath 保持一致
   },
   css: {
     loaderOptions: {

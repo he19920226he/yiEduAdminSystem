@@ -1,9 +1,19 @@
 import request from '@/plugin/axios'
 
-export function AccountLogin (data) {
+// 这里是get请求，后台没有做特殊处理，所以只能通过url拼接query的方式
+function LoginAdmin (data) {
   return request({
-    url: '/login',
-    method: 'post',
-    data
+    url: `/login/manager/goLogin?name=${data.name}&password=${data.password}`,
+    method: 'get'
   })
 }
+
+//
+function LoginTeacher (data) {
+  return request({
+    url: `/login/tec/goLogin?phone=${data.phone}&password=${data.password}`,
+    method: 'get'
+  })
+}
+
+export { LoginAdmin, LoginTeacher }

@@ -1,10 +1,10 @@
 {
   "name": "d2-admin",
-  "version": "1.7.2",
+  "version": "1.0.8",
   "scripts": {
     "serve": "vue-cli-service serve --open",
-    "start": "npm run serve",
-    "dev": "npm run serve",
+    "start": "npm run serve --open",
+    "dev": "npm run serve --open",
     "build": "vue-cli-service build",
     "build:nomock": "vue-cli-service build --mode nomock",
     "build:travis": "vue-cli-service build --mode travis",
@@ -27,6 +27,7 @@
     "nprogress": "^0.2.0",
     "qs": "^6.7.0",
     "screenfull": "^4.2.0",
+    "sortablejs": "^1.10.1",
     "ua-parser-js": "^0.7.19",
     "vue": "^2.6.10",
     "vue-i18n": "^8.14.0",

@@ -1,18 +1,19 @@
+<!--
+ * @Description:
+ * @version:
+ * @Author: lxw
+ * @Date: 2019-11-05 11:10:56
+ * @LastEditors: lxw
+ * @LastEditTime: 2019-11-05 21:04:03
+ -->
 <template>
   <div class="d2-page-cover">
     <div class="d2-page-cover__logo">
       <slot/>
     </div>
-    <p class="d2-page-cover__title">D2 Admin {{$version}}</p>
-    <p class="d2-page-cover__sub-title">优雅的中后台集成方案</p>
-    <p class="d2-page-cover__build-time">FINAL BUILD TIME {{$buildTime}}</p>
+    <p class="d2-page-cover__title">YiEdu {{$version}}</p>
+    <p class="d2-page-cover__sub-title">欢迎管理员与教师使用</p>
     <slot name="footer"/>
-    <a target="blank" href="https://github.com/d2-projects/d2-admin">
-      <img
-        style="position: absolute; top: 0; right: 0; border: 0; width: 150px;"
-        src="./image/darkblue@2x.png"
-        alt="Fork me on GitHub">
-    </a>
   </div>
 </template>
 

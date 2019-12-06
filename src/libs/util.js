@@ -1,11 +1,21 @@
+/*
+ * @Description:
+ * @version:
+ * @Author: lxw
+ * @Date: 2019-11-05 11:10:56
+ * @LastEditors: lxw
+ * @LastEditTime: 2019-11-21 20:03:42
+ */
 import cookies from './util.cookies'
 import db from './util.db'
 import log from './util.log'
+import menuFormate from './util.menu.formate'
 
 const util = {
   cookies,
   db,
-  log
+  log,
+  menuFormate
 }
 
 /**
@@ -13,7 +23,7 @@ const util = {
  * @param {String} title 标题
  */
 util.title = function (titleText) {
-  const processTitle = process.env.VUE_APP_TITLE || 'D2Admin'
+  const processTitle = '易教育'
   window.document.title = `${processTitle}${titleText ? ` | ${titleText}` : ''}`
 }
 
