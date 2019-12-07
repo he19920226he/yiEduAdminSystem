@@ -12,7 +12,7 @@
       <el-col :span="8">
         <el-input
           @keyup.enter.native="searchByKeyword"
-          placeholder="请输入管理员相关信息"
+          placeholder="请输入管理员手机号"
           prefix-icon="el-icon-search"
           v-model="searchInfo.keyword"
         ></el-input>
@@ -44,29 +44,53 @@
         <el-form-item label="管理员密码" prop="password">
           <el-input show-password v-model="formAdminer.password" placeholder="管理员密码"></el-input>
         </el-form-item>
+        <el-form-item label="角色" prop="roleId">
+          <el-select diasabled
+                  v-model="formAdminer.roleId"
+                  placeholder="请选择分配给管理员的角色"
+                  style="width: 100%;"
+          >
+            <el-option
+                    v-for="(item,index) in roles"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.roleId"
+                    :disabled="true"
+            ></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="changeInfo">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { managerSelectAll, managerSelectByPhone } from '@/api/user/searchUser.js'
+import { updateUser } from '@/api/user/updateUser.js'
+import { selectAllRole } from '@/api/role/searchRole.js'
 export default {
   name: 'adminer',
   data () {
     var checkPhone = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('手机号不能为空'))
+      } else {
+        var myreg = /^[1][3,4,5,7,8][0-9]{9}$/
+        if (!myreg.test(value)) {
+          return callback(new Error('手机号格式不对'))
+        }
       }
+      callback()
     }
     return {
       searchInfo: {
         keyword: '',
-        size: '', // 分页的每一页数目
-        indexPageNum: '' // 当前分页的页码
+        size: 6, // 分页的每一页数目
+        indexPageNum: 1 // 当前分页的页码
       },
       // 页面需要渲染的数据:包括当前页面以及制作复用子组件，渲染的数据是需要传递给子组件的。
       showDatas: {
@@ -123,7 +147,8 @@ export default {
         id: '',
         name: '',
         password: '',
-        phone: ''
+        phone: '',
+        roleId: ''
       },
       rules: {
         name: [
@@ -137,46 +162,110 @@ export default {
         // 没有手机校验规则，所以自定义校验规则
         phone: [
           { validator: checkPhone, trigger: 'blur' }
+        ],
+        roleId: [
+          { required: true, message: '请选择角色', trigger: 'change' }
         ]
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      roles: []
     }
   },
   mounted () {
-    let loading = this.$myLoading('切换中')
-    setTimeout(() => {
-      loading.close()
-      this.showDatas.adminerDatas.push({
-        id: '0001',
-        name: '超级管理员',
-        phone: '1001010010',
-        password: '123456'
-      })
-      this.showDatas.adminerDatas.push({
-        id: '0002',
-        name: '普通管理员1',
-        phone: '1001990010',
-        password: '123456'
-      })
-      this.showDatas.adminerDatas.push({
-        id: '0003',
-        name: '普通管理员2',
-        phone: '1001990023',
-        password: '123456'
-      })
-      this.showDatas.pageInfos.totalPage = 3
-      this.showDatas.pageInfos.isShowPage = true
-    }, 500)
+    // 一开始查询全部--带分页的
+    this.searchAllManager()
   },
   methods: {
+    searchAllManager () {
+      let loading = this.$myLoading('查询中...')
+      // 分页信息
+      let data = {
+        pageNum: this.searchInfo.indexPageNum,
+        pageSize: this.searchInfo.size
+      }
+      managerSelectAll(data).then(res => {
+        console.log(res)
+        this.datasShow(res)
+        loading.close()
+      }).catch(err => {
+        console.log(err)
+        loading.close()
+      })
+    },
+    // 统一表格数据处理：同一个表格实例数据渲染处理：需要判断是否有数据，因为后台没有数据的时候传过来的都是null，此外有数据的时候胡还要判断是否是数组
+    datasShow (res) {
+      if (res.message === '无数据') {
+        this.showDatas.adminerDatas = []
+      } else {
+        this.showDatas.adminerDatas = []
+        if (Array.isArray(res.data)) {
+          this.showDatas.adminerDatas = res.data
+        } else {
+          this.showDatas.adminerDatas.push(res.data)
+        }
+      }
+      let isShow = !(res.count === 0 || res.count === 1)
+      // TODO:分页总数目需要加上去
+      this.showDatas.pageInfos = {
+        totalPage: res.count,
+        pageSize: [6, 12, 24, 36],
+        isShowPage: isShow
+      }
+    },
     searchByKeyword () {
       console.log(this.searchInfo.keyword)
+      if (this.searchInfo.keyword.replace(/\s*/g, '') === '') {
+        this.searchAllManager()
+      } else {
+        this.searchManagerByPhone()
+      }
+    },
+    searchManagerByPhone () {
+      let loading = this.$myLoading('查询中...')
+      let data = {
+        phone: this.searchInfo.keyword
+      }
+      managerSelectByPhone(data).then(res => {
+        console.log(res)
+        this.datasShow(res)
+        loading.close()
+      }).catch(errs => {
+        loading.close()
+      })
+    },
+    searchAllRole () {
+      let loading = this.$myLoading('查询中...')
+      // 分页信息
+      let data = {
+        pageNum: 1,
+        pageSize: 1000
+      }
+      selectAllRole(data).then(res => {
+        console.log(res)
+        this.rolessShow(res)
+        loading.close()
+      }).catch(err => {
+        console.log(err)
+        loading.close()
+      })
+    },
+    rolessShow (res) {
+      if (res.message === '无数据') {
+        this.roles = []
+      } else {
+        this.roles = []
+        if (Array.isArray(res.data)) {
+          this.roles = res.data
+        } else {
+          this.roles.push(res.data)
+        }
+      }
     },
     // 子组件通过emit触发@xxx事件，函数定义在这里，接受到子组件传递的数据之后写相关业务逻辑
-    operateFun (ind, type) {
+    async operateFun (ind, type) {
       if (type === '编辑') {
-        let loading = this.$myLoading('数据加载中...')
-        loading.close()
+        // 查询系统的全部角色信息显示在下拉框
+        await this.searchAllRole()
         this.dialogFormVisible = !this.dialogFormVisible
         //! 信息回显到表单:注意表格的一条记录数据从后台获取，但是我们通过字段过滤显示部分数据。但是记录里面是全部的信息，目的是为了
         //! 回显信息到表单。
@@ -187,24 +276,22 @@ export default {
           }
         }
       } else {
-        //  删除信息
-        this.$confirm('此操作将删除管理员, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$message({
+          message: '暂无权限删除超级管理员',
           type: 'warning'
         })
-          .then(() => {
-            // 删除管理员
-            let adminerId = this.showDatas.adminerDatas[ind].id
-            console.log(adminerId)
-          })
-          .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            })
-          })
       }
+    },
+    // 确认修改管理员信息
+    changeInfo () {
+      console.log(this.formAdminer)
+      let loading = this.$myLoading('修改中...')
+      updateUser(this.formAdminer).then(res => {
+        console.log(res)
+        this.searchByKeyword()
+        this.dialogFormVisible = false
+        loading.close()
+      }).catch(errs => { loading.close() })
     },
     /**
      * @description:改变每页显示的条数，重新发送请求。

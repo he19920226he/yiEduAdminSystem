@@ -24,10 +24,10 @@
               :key="index1"
               size="mini"
               :type="item1.type"
-              @click="handleClick(scope.$index,item1.name)"
+              @click="handleClick(scope.$index,item1.name !== '自定义'? item1.name : scope.row.state === '正常'? '禁用':'启用')"
             >
               <i :class="item1.icon"></i>
-              {{item1.name}}
+              {{item1.name !== '自定义'? item1.name : scope.row.state === '正常'? '禁用':'启用' }}
             </el-button>
             <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)"> <i class="el-icon-delete"></i> 删除
             </el-button>-->

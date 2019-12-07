@@ -15,6 +15,9 @@
       <el-tab-pane label="添加易教育平台老师" name="teacher">
         <div :is="currentComponent"></div>
       </el-tab-pane>
+      <el-tab-pane label="添加易平台用户" name="user">
+        <div :is="currentComponent"></div>
+      </el-tab-pane>
     </el-tabs>
   </d2-container>
 </template>
@@ -22,6 +25,7 @@
 <script>
 import adminer from './components/adminer'
 import teacher from './components/teacher'
+import user from './components/user'
 export default {
   name: 'searchUser',
   data () {
@@ -55,7 +59,8 @@ export default {
   },
   components: {
     adminer,
-    teacher
+    teacher,
+    user
   }
 }
 </script>
