@@ -6,6 +6,8 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# 自动部署到服务器配置文件，里面有服务器密码相关信息不要传到github上
+upload.js
 
 # Editor directories and files
 .idea

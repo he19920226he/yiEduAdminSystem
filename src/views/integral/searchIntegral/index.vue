@@ -4,22 +4,35 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-20 20:08:36
+ * @LastEditTime: 2020-03-22 20:29:52
  -->
 <template>
   <d2-container>
     <template slot="header">查询用户积分</template>
     <div class="searchIntegral">
       <el-row class="d2-mb-10" :gutter="40">
-        <el-col :span="8">
-          <el-date-picker
-            v-model="searchInfo.courseTime"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          ></el-date-picker>
-        </el-col>
+         <el-col :span="6">
+        <el-input
+                @keyup.enter.native="searchByKeyword"
+                placeholder="请输入学生名称"
+                prefix-icon="el-icon-search"
+                v-model="searchInfo.name"
+        ></el-input>
+      </el-col>
+      <el-col :span="6">
+        <el-date-picker
+                style="width:90%!important;"
+                v-model="searchInfo.courseTime"
+                type="daterange"
+                value-format="yyyy-MM-dd"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-col>
+      <el-col :span="6" style="text-align: left;padding-left: -50px!important;">
+        <el-button type="primary" icon="el-icon-search" size="small" @click="searchIntegral">查询</el-button>
+      </el-col>
       </el-row>
       <el-row class="d2-mb-10">
         <p class="info">积分信息</p>
@@ -116,15 +129,16 @@
 </template>
 
 <script>
+import { selectIntel } from '@/api/interal/serachIntel.js'
 export default {
   name: 'searchIntegral',
   data () {
     return {
       searchInfo: {
-        courseTime: '', // 课程创建时间段
-        keyword: '',
-        size: '', // 分页的每一页数目
-        indexPageNum: '' // 当前分页的页码
+        courseTime: '', // 积分创建时间段
+        name: '', // 学生名称
+        size: 6, // 分页的每一页数目
+        indexPageNum: 1 // 当前分页的页码
       },
       // 页面需要渲染的数据:包括当前页面以及制作复用子组件，渲染的数据是需要传递给子组件的。
       showDatas: {
@@ -132,35 +146,30 @@ export default {
         // 定义表格头部数据：一般是固定自己需要的几个字段:所以可以直接在这里定义:也算是定义渲染的模板对象
         integralAttributs: [
           {
-            attributes: 'inte_id',
+            attributes: 'inteId',
             name: '积分编码',
             // 配置每一列的宽度，如果是为了全屏显示的话最后一个不要配置宽度
             width: '200'
           },
           {
             attributes: 'stuid', // TODO:
-            name: '用户昵称',
+            name: '用户编码',
             width: '200'
           },
           {
-            attributes: 'other_name',
+            attributes: 'otherName',
             name: '积分来源',
             width: '200'
           },
           {
-            attributes: 'other_value',
+            attributes: 'otherValue',
             name: '积分值',
             width: '180'
           },
           {
-            attributes: 'get_time',
+            attributes: 'getTime',
             name: '获得时间',
             width: '200'
-          },
-          {
-            attributes: ' state',
-            name: '积分状态',
-            width: ''
           }
         ],
         // 这里需要表格的尾列显示编辑、删除按钮:如果不需要显示操作列，请给它赋值false：实现是通过v-if="operateData"
@@ -227,14 +236,80 @@ export default {
     }
   },
   mounted () {
-    let loading = this.$myLoading('切换中')
-    setTimeout(() => {
-      loading.close()
-    }, 500)
+    this.getIntegral()
   },
   methods: {
+    searchIntegral () {
+      this.getIntegral()
+    },
+    getIntegral () {
+      let loading = this.$myLoading('查询中...')
+      // 添加查询的query过滤处理
+      let data = this.getQuery()
+      console.log(data)
+      // 开始查询
+      selectIntel(data).then(res => {
+        console.log(res)
+        this.datasShow(res)
+        loading.close()
+      }).catch(errs => { loading.close() })
+    },
+    datasShow (res) {
+      if (res.message === '无数据') {
+        this.showDatas.integralDatas = []
+      } else {
+        this.showDatas.integralDatas = []
+        if (Array.isArray(res.data)) {
+          this.showDatas.integralDatas = res.data
+          for (let i = 0; i < this.showDatas.integralDatas.length; i++) {
+            this.showDatas.integralDatas[i].state = this.showDatas.integralDatas[i].state === 0 ? '正常' : '禁用'
+            // 注册时间：毫秒转正常的时间格式
+            this.showDatas.integralDatas[i].getTime = this.DateFormate(this.showDatas.integralDatas[i].getTime)
+            for (let key in this.showDatas.integralDatas[i]) {
+              if (this.showDatas.integralDatas[i][key] === null) {
+                this.showDatas.integralDatas[i][key] = '暂无信息'
+              }
+            }
+          }
+        } else {
+          this.showDatas.integralDatas.push(res.data)
+        }
+      }
+      let isShow = !(res.count === 0 || res.count === 1)
+      // TODO:分页总数目需要加上去
+      this.showDatas.pageInfos = {
+        totalPage: res.count,
+        pageSize: [6, 12, 24, 36],
+        isShowPage: isShow
+      }
+    },
+    getQuery () {
+      // 根据不为空的字段获取实际的query
+      let obj = {}
+      for (let key in this.searchInfo) {
+        if (this.searchInfo[key] !== '' && this.searchInfo[key] !== null) {
+          if (key === 'size') {
+            obj['pageSize'] = this.searchInfo[key]
+          } else if (key === 'indexPageNum') {
+            obj['pageNum'] = this.searchInfo[key]
+          } else if (key === 'courseTime') {
+            obj['beforeDate'] = this.searchInfo[key][0]
+            obj['afterDate'] = this.searchInfo[key][1]
+          } else {
+            obj[key] = this.searchInfo[key]
+          }
+        }
+      }
+      console.log(obj)
+      return obj
+    },
+    // 毫秒转时间格式
+    DateFormate (time) {
+      var date = new Date(time)
+      return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDay() < 10 ? '0' + (date.getDay() + 1) : date.getDay() + 1}`
+    },
     searchByKeyword () {
-      console.log(this.searchInfo.keyword)
+      this.getIntegral()
     },
     // 子组件通过emit触发@xxx事件，函数定义在这里，接受到子组件传递的数据之后写相关业务逻辑
     operateFun (ind, type) {

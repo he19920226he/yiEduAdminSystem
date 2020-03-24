@@ -47,6 +47,7 @@ import { addRole } from '@/api/role/addRole.js'
 <script>
 import { addRole } from '../../../api/role/addRole'
 import { selectAll } from '@/api/permission/searchPermision'
+import { addPermisionRole } from '@/api/role-permision/addPermisionRole.js'
 
 export default {
   name: 'addRole',
@@ -63,7 +64,8 @@ export default {
           { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
         ]
       },
-      permisionData: [] // 权限信息
+      permisionData: [], // 权限信息
+      roleId: ''
     }
   },
   mounted () {
@@ -86,6 +88,7 @@ export default {
       let loading = this.$myLoading('添加中...')
       addRole(data).then(res => {
         console.log(res)
+        this.roleId = res.data
         loading.close()
         // 判断是否还需要分配权限
         this.givePermision()
@@ -96,8 +99,16 @@ export default {
     },
     givePermision () {
       if (this.formRole.permisionIds.length !== 0) {
-        // 需要分配权限
-        //TODO:
+        for (var i = 0; i < this.formRole.permisionIds.length; i++) {
+          // 分配权限
+          let data = {
+            'permissionId': this.formRole.permisionIds[i],
+            'roleId': this.roleId
+          }
+          addPermisionRole(data).then(res => {
+            console.log(res)
+          }).catch(errs => {})
+        }
       }
     },
     // 分配权限相关：

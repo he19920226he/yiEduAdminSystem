@@ -37,7 +37,7 @@
                 <el-form-item>
                   <div class="checkRole">
                     <small>请选择您的身份</small>
-                    <el-radio-group v-model="roleType">
+                    <el-radio-group v-model="roleType" @change="roleChange">
                       <el-radio :label="1">超级管理员</el-radio>
                       <el-radio :label="2">教师</el-radio>
                     </el-radio-group>
@@ -91,8 +91,8 @@ export default {
       // 选中自己的角色后进行
       // 表单
       formLogin: {
-        name: '管理员3',
-        password: '1234'
+        name: 'superAdmin',
+        password: '123456'
       },
       // 表单校验
       rules: {
@@ -192,6 +192,20 @@ export default {
           loading.close()
         }
       })
+    },
+    roleChange (roleType) {
+      console.log(roleType)
+      if (roleType === 1) {
+        this.formLogin = {
+          name: 'superAdmin',
+          password: '123456'
+        }
+      } else if (roleType === 2) {
+        this.formLogin = {
+          name: '13715075921',
+          password: '123456'
+        }
+      }
     }
   }
 }

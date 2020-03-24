@@ -4,14 +4,13 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-21 21:37:30
+ * @LastEditTime: 2020-03-24 20:28:11
  -->
 <template>
   <d2-container>
     <template slot="header">添加课程</template>
     <div class="addCourse">
       <!--添加课程步骤条 -->
-
       <el-row>
         <el-steps :active="stepActive" align-center finish-status="success">
           <el-step title="步骤一" description="添加课程基本信息"></el-step>
@@ -32,29 +31,49 @@
         >
           <el-row :gutter="50">
             <el-col :span="12">
-              <el-form-item label="一级类别" prop="Parentkid" style="width:100%!important;">
+              <el-form-item label="课程类别" prop="kid" style="width:100%!important;">
                 <el-select
-                  v-model="formCourse.Parentkid"
-                  placeholder="请选择一级类别"
+                  v-model="formCourse.kid"
+                  placeholder="请选择课程类别"
                   style="width:100%!important;"
                 >
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
+                  <el-option v-for="(item,index) in vary"  :label="item.kindName" :value="item.kid" :key="index"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="二级类别" prop="kid" style="width:100%!important;">
+              <el-form-item label="教师" prop="tecid" style="width:100%!important;">
                 <el-select
-                  v-model="formCourse.kid"
-                  placeholder="请选择二级类别"
-                  style="width:100%!important;"
+                        v-model="formCourse.tecid"
+                        placeholder="请选择课程教师"
+                        style="width:100%!important;"
                 >
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
+                  <el-option v-for="(item,index) in teachers"  :label="item.tecname" :value="item.tecid" :key="index"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
+<!--            <el-col :span="8">-->
+<!--              <el-form-item label="二级类别" prop="secondId" style="width:100%!important;">-->
+<!--                <el-select-->
+<!--                  v-model="formCourse.secondId"-->
+<!--                  placeholder="请选择二级类别"-->
+<!--                  style="width:100%!important;"-->
+<!--                >-->
+<!--                  <el-option  v-for="(item,index) in secondVary"  :label="item.kindName" :value="item.kid" :key="index"></el-option>-->
+<!--                </el-select>-->
+<!--              </el-form-item>-->
+<!--            </el-col>-->
+<!--            <el-col :span="8">-->
+<!--              <el-form-item label="三级类别" prop="thirdId" style="width:100%!important;">-->
+<!--                <el-select-->
+<!--                        v-model="formCourse.thirdId"-->
+<!--                        placeholder="请选择三级类别"-->
+<!--                        style="width:100%!important;"-->
+<!--                >-->
+<!--                  <el-option  v-for="(item,index) in thirdVary"  :label="item.kindName" :value="item.kid" :key="index"></el-option>-->
+<!--                </el-select>-->
+<!--              </el-form-item>-->
+<!--            </el-col>-->
           </el-row>
           <el-row :gutter="50">
             <el-col :span="12">
@@ -70,8 +89,8 @@
           </el-row>
           <el-row :gutter="50">
             <el-col :span="12">
-              <el-form-item label="课程时长" prop="crouse_time">
-                <el-input v-model.number="formCourse.crouse_time" placeholder="课程时长"></el-input>
+              <el-form-item label="课程时长" prop="crouseTime">
+                <el-input v-model.number="formCourse.crouseTime" placeholder="课程时长"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -80,22 +99,40 @@
               </el-form-item>
             </el-col>
           </el-row>
+
           <el-row :gutter="50">
             <el-col :span="12">
               <el-form-item label="积分值" prop="integral">
-                <el-input v-model="formCourse.integral" placeholder="课程积分值"></el-input>
+                <el-input v-model.number="formCourse.integral" placeholder="课程积分值"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="课程介绍" prop="crouse_introduce">
-                <el-input type="textarea" v-model="formCourse.crouse_introduce" placeholder="课程介绍"></el-input>
+              <el-form-item label="课程图片" prop="img">
+                <el-input type="input" v-model="formCourse.img" placeholder="课程图片--输入图片url"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+<!--上传图片后在这里展示与预览-->
+          <el-row :gutter="50" v-if="formCourse.img!==''">
+            <el-col :span="12"  :offset="12" style="height:200px;text-align: center;">
+<!--预览图片的地方-->
+              <el-image
+                      style="width:70%; height:90%"
+                      :src="formCourse.img"
+                      fit="fill"></el-image>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24">
+              <el-form-item label="课程介绍" prop="crouseIntroduce">
+                <el-input type="textarea" v-model="formCourse.crouseIntroduce" placeholder="课程介绍"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="6" :offset="9">
               <el-button v-if="stepActive!=0" @click="backStep">返回上一步</el-button>
-              <el-button type="success" @click="next">保存</el-button>
+              <el-button type="success" @click="next('formCourse')">保存</el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -103,12 +140,24 @@
 
       <!-- 视频上传，一次只能上传一个，显示上传进度，成功后显示视频播放 -->
       <transition name="fade">
-        <div v-if="stepActive===1" style="margin-top:20px;">
+        <div v-show="stepActive===1" style="margin-top:20px;">
+          <el-row >
+            <el-col :span="6" :offset="8">
+
+              <el-form :model="videoInfo" :rules="videoRules" ref="videoInfo" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="视频标题" prop="title">
+                  <el-input type="input" v-model="videoInfo.title" placeholder="视频标题格式1-1 xx视频"></el-input>
+                </el-form-item>
+              </el-form>
+
+            </el-col>
+          </el-row>
           <el-row :gutter="10">
             <el-col :span="6" :offset="8">
               <el-upload
                 class="upload-demo"
                 drag
+                :data="videoInfo"
                 :with-credentials="true"
                 :action="uploadUrl"
                 :on-success="handleVideoSuccess"
@@ -121,14 +170,15 @@
                   将视频拖到此处，或
                   <em>点击上传</em>
                 </div>
-                <div class="el-upload__tip" slot="tip">请保证视频格式正确，且不超过10M</div>
+                <div class="el-upload__tip" slot="tip">请保证视频格式正确，且一次大小不超过600M</div>
               </el-upload>
             </el-col>
-            <el-col :span="6">
-              <!-- <video v-if="videoSrc!==''" :src="videoSrc">
-                  您的浏览器不支持视频播放
-              </video>-->
-              <img v-if="videoSrc!==''" :src="videoSrc" />
+          </el-row>
+          <el-row :gutter="10">
+            <el-col :span="6" :offset="8">
+              <video v-if="videoSrc!==''" :src="videoSrc" id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='width: 100%;height: auto'>
+                您的浏览器不支持视频播放
+              </video>
             </el-col>
           </el-row>
 
@@ -143,7 +193,7 @@
 
       <!-- 试题上传，一次只能上传一个，显示上传进度，成功后显示视频播放 -->
       <transition name="fade">
-        <div v-if="stepActive===2" style="margin-top:20px;">
+        <div v-show="stepActive===2" style="margin-top:20px;">
           <el-row :gutter="10">
             <el-col :span="6" :offset="8">
               <el-upload
@@ -161,7 +211,7 @@
                   将试题文件拖到此处，或
                   <em>点击上传</em>
                 </div>
-                <div class="el-upload__tip" slot="tip">支持上传文本文件，请确保不要上传文件格式正确，大小不不超过10M</div>
+                <div class="el-upload__tip" slot="tip">支持上传文本文件，请确保不要上传文件格式正确，一次大小不不超过10M</div>
               </el-upload>
             </el-col>
           </el-row>
@@ -177,7 +227,7 @@
 
       <!-- 课程信息预览，确认发布 -->
       <transition name="fade">
-        <div v-if="stepActive===3">
+        <div v-show="stepActive===3">
           <el-row>
             <el-col :span="24" class="center">
               <h4>
@@ -192,92 +242,152 @@
             </el-col>
           </el-row>
           <el-row>
-            <el-col
-              :span="4"
-              v-for="(value,key,index) in preview.basicCourseInfo"
-              :key="index"
-              style="margin-bottom:25px!important;"
+            <el-form
+
+                    :model="formCourse"
+                    :rules="rules"
+                    ref="formCourse"
+                    class="demo-form-inline"
             >
-              <div v-if="key!='课程介绍'">
-                <span
-                  class="attribute"
-                  style="color:#000!important;margin-right:20px;"
-                  v-text="key+':'"
-                ></span>
-                <span style="color:#909399!important;" v-text="value"></span>
-              </div>
-            </el-col>
-            <el-col :span="8">
-              <span
-                class="attribute"
-                style="color:#000!important;margin-right:20px;">课程介绍:</span>
-              <span style="color:#909399!important;" v-text="preview.basicCourseInfo['课程介绍']"></span>
-            </el-col>
+              <el-row :gutter="50">
+                <el-col :span="12">
+                  <el-form-item label="课程类别" prop="kid" style="width:100%!important;">
+                    <el-select
+                            v-model="formCourse.kid"
+                            placeholder="请选择课程类别"
+                            style="width:100%!important;"
+                    >
+                      <el-option v-for="(item,index) in vary"  :label="item.kindName" :value="item.kid" :key="index"  :disabled="true"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="教师" prop="tecid" style="width:100%!important;">
+                    <el-select
+                            v-model="formCourse.tecid"
+                            placeholder="请选择课程教师"
+                            style="width:100%!important;"
+                    >
+                      <el-option v-for="(item,index) in teachers"  :label="item.tecname" :value="item.tecid" :key="index" :disabled="true"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+
+              </el-row>
+              <el-row :gutter="50">
+                <el-col :span="12">
+                  <el-form-item label="课程名" prop="cname">
+                    <el-input :disabled="true" v-model="formCourse.cname " placeholder="课程名字"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="总分数" prop="score">
+                    <el-input  :disabled="true" v-model.number="formCourse.score" placeholder="课程总分数"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row :gutter="50">
+                <el-col :span="12">
+                  <el-form-item label="课程时长" prop="crouseTime">
+                    <el-input :disabled="true" v-model.number="formCourse.crouseTime" placeholder="课程时长"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="课程价格" prop="price">
+                    <el-input :disabled="true" v-model.number="formCourse.price" placeholder="课程价格"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row :gutter="50">
+                <el-col :span="12">
+                  <el-form-item label="积分值" prop="integral">
+                    <el-input :disabled="true" v-model.number="formCourse.integral" placeholder="课程积分值"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="课程图片" prop="img">
+                    <el-input :disabled="true" type="input" v-model="formCourse.img" placeholder="课程图片"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>l
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item label="课程介绍" prop="crouseIntroduce">
+                    <el-input :disabled="true" type="textarea" v-model="formCourse.crouseIntroduce" placeholder="课程介绍"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+
+            </el-form>
           </el-row>
 
           <el-divider style="margin:0px!important;"></el-divider>
 
           <el-row>
-            <el-col :span="24">
-              <h5 class="mainColor left-line">课程视频本信息:</h5>
+          <el-col :span="24">
+            <h5 class="mainColor left-line">课程视频信息:</h5>
+          </el-col>
+        </el-row>
+          <el-row>
+            <el-col :span="24" style="padding: 10px;">
+              <a v-for="(item,index) in videoSave" :key="index" @click="watchViedo(item)" class="el-upload-list__item-name"><i class="el-icon-document"></i>{{item.title+'.mp4'}}
+              </a>
             </el-col>
+          </el-row>
+          <el-row style="margin-top: 20px;">
+            <el-button v-if="stepActive!=0" @click="backStep">返回上一步</el-button>
+            <el-button type="success" @click="fabu">发布</el-button>
           </el-row>
           <el-row>
 
           </el-row>
-
-           <el-divider style="margin:0px!important;"></el-divider>
-
-          <el-row>
-            <el-col :span="24">
-              <h5 class="mainColor left-line">课程试题信息:</h5>
-            </el-col>
-          </el-row>
-
         </div>
       </transition>
+      <el-dialog  :title="currentvideoInfo" :visible.sync="dialogTableVisible">
+<!-- 播放当前选择的视频-->
+        <video  :src="currentvideoSrc"  class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='margin-left: 5%; width: 90%;height: auto'>
+          您的浏览器不支持视频播放
+        </video>
+      </el-dialog>
     </div>
   </d2-container>
 </template>
 
 <script>
+import { addCourseBase } from '@/api/course-vary/addCourse.js'
+import { selectAllVary } from '@/api/course-vary/selectAll.js'
+import { teacherSelect } from '@/api/user/searchUser.js'
+import { updateCourseBase } from '@/api/course-vary/updateCourse.js'
 export default {
   name: 'addCourse',
   data () {
     return {
-      stepActive: 3, // 添加课程进行到的步骤
+      currentvideoInfo: '',
+      currentvideoSrc: '',
+      dialogTableVisible: false,
+      isaddBase: false,
+      isUpdate: false,
+      courseBaseInfo: '',
+      stepActive: 0, // 添加课程进行到的步骤
       // 表单相关：数据、验证
       formCourse: {
-        Parentkid: '',
         kid: '',
         cname: '', // 课程名
         score: '', // 课程成绩
-        crouse_time: '', // 课程时长
+        crouseTime: '', // 课程时长
         price: '', // 课程价格
         integral: '', // 积分值
-        crouse_introduce: '' // 课程介绍
+        crouseIntroduce: '', // 课程介绍
+        tecid: '', // 课程教师
+        img: ''
       },
       rules: {
-        Parentkid: [
-          {
-            required: true,
-            message: '请选择课程一级类别',
-            trigger: 'change'
-          }
-        ],
-        kid: [
-          {
-            required: true,
-            message: '请选择课程二级类别',
-            trigger: 'change'
-          }
-        ],
         cname: [{ required: true, message: '请输入课程名字', trigger: 'blur' }],
         score: [
           { required: true, message: '请输入课程成绩', trigger: 'blur' },
           { type: 'number', message: '分数必须为数字' }
         ],
-        crouse_time: [
+        crouseTime: [
           { required: true, message: '请输入课程时长', trigger: 'blur' },
           { type: 'number', message: '时长必须为数字' }
         ],
@@ -288,13 +398,23 @@ export default {
         integral: [
           { required: true, message: '请输入课程积分', trigger: 'blur' },
           { type: 'number', message: '积分必须为数字' }
-        ],
-        crouse_introduce: [
-          { required: true, message: '请输入课程介绍', trigger: 'blur' }
         ]
       },
+      vary: [],
+      teachers: [],
+      videoInfo: {
+        cid: '',
+        title: ''
+      },
+      videoRules: {
+        title: [
+          { required: true, message: '请输入视频标题名称', trigger: 'blur' }
+        ]
+      },
+      currentCid: '', // 接收第一步添加完课程之后的cid
+      videoSave: [], // 每次上传成功一个视频保存其title还有播放地址，方便后面预览
       // 视频上传地址
-      uploadUrl: 'https://jsonplaceholder.typicode.com/posts/',
+      uploadUrl: 'videoInfo/upload',
       videoFlag: false, // 视频是否上传完成标志
       videoSrc: '', // 上传视频完成后返回的视频地
       videoUploadPercent: 0, // 上传进度
@@ -316,61 +436,122 @@ export default {
     }
   },
   mounted () {
-    let loading = this.$myLoading('切换中')
-    setTimeout(() => {
-      loading.close()
-      // 获取图标数据
-    }, 500)
+    this.geFirstVary()
+    this.getTeachers()
+    //  由于环境变量在这无法使用，所以根据开发环境来判断使用那一个baseurl
+    if (process.env.NODE_ENV === 'development') {
+      // this.uploadUrl = process.env.VUE_APP_API + this.uploadUrl
+      this.uploadUrl = `http://localhost:8080/${this.uploadUrl}`
+    } else if (process.env.NODE_ENV === 'production') {
+      this.uploadUrl = `http://47.103.223.248:8095/YIedu/${this.uploadUrl}`
+    }
   },
   methods: {
+    geFirstVary () {
+      let data = {
+        level: 2
+      }
+      selectAllVary(data).then(res => {
+        console.log(data)
+        this.vary = res.data
+      }).catch(errs => {})
+    },
+    getTeachers () {
+      let data = {
+        pageNum: 1,
+        pageSize: 100
+      }
+      teacherSelect(data).then(res => {
+        console.log(res)
+        this.teachers = res.data
+      }).catch(errs => {
+
+      })
+    },
+    firstChange () {
+      console.log(this.formCourse.firstid)
+    },
     handleChange (value, direction, movedKeys) {
       console.log(value, direction, movedKeys)
       //! value就是当前被分配的所有的权限id
     },
-    next () {
+    next (formName) {
       if (this.stepActive === 3) {
         return
       }
-      this.stepActive++
+      if (this.stepActive === 0) {
+        // 保存课程基本信息
+        this.$refs[formName].validate((valid) => {
+          console.log(valid)
+          if (valid) {
+            console.log(this.formCourse)
+            let loading = this.$myLoading('修改中...')
+
+            if (this.isaddBase === false) {
+              addCourseBase(this.formCourse).then(res => {
+                loading.close()
+                console.log(res)
+                this.isaddBase = true
+                // 保存课程id
+                this.videoInfo.cid = res.data
+                this.stepActive++
+              }).catch(errs => {
+                loading.close()
+              })
+            } else {
+              // 修改
+              this.formCourse.cid = this.videoInfo.cid
+              updateCourseBase(this.formCourse).then(res => {
+                loading.close()
+                this.stepActive++
+              }).catch(errs => {
+                loading.close()
+              })
+            }
+          } else {
+            this.$message.error('输入内容有误，请检查对应输入框')
+            return false
+          }
+        })
+      }
+      if (this.stepActive === 1 || this.stepActive === 2) {
+        this.stepActive++
+      }
     },
     backStep () {
       if (this.stepActive === 0) {
         return
       }
+      if (this.stepActive === 1) {
+        this.isUpdate = true
+      }
       this.stepActive--
     },
-    // 上传视频前对文件格式进行验证
+    // 上传视频前对文件格式进行验证，以及对额外参数的表单进行一些校验
     beforeUploadVideo (file) {
-      // const isLt10M = file.size / 1024 / 1024 < 10
-      // if (
-      //   [
-      //     'video/mp4',
-      //     'video/ogg',
-      //     'video/flv',
-      //     'video/avi',
-      //     'video/wmv',
-      //     'video/rmvb'
-      //   ].indexOf(file.type) == -1
-      // ) {
-      //   this.$message.error('请上传正确的视频格式')
-      //   return false
-      // }
-      // if (!isLt10M) {
-      //   this.$message.error('上传视频大小不能超过10MB哦!')
-      //   return false
-      // }
+      this.$refs['videoInfo'].validate((valid) => {
+        if (valid) {
+
+        } else {
+          // 没有用
+          return false
+        }
+      })
+      if (this.videoInfo.title === '') {
+        this.$message.error('视频标题信息不能为空，请先填写标题信息')
+        return false
+      }
     },
     // 上传成功后显
     handleVideoSuccess (res, file) {
-      console.log(file)
-      // this.videoFlag = false
-      // this.videoUploadPercent = 0
-      // if (res.status === 200) {
-      //   // this.videoForm.videoUploadId = res.data.uploadId
-      //   this.videoSrc = res.data.uploadUrl
-      // } else {
-      //   this.$message.error('视频上传失败，请重新上传！')
-      // }
+      this.videoSrc = URL.createObjectURL(file.raw)
+      // 保存视频信息
+      let json = {
+        title: this.videoInfo.title,
+        videoSrc: URL.createObjectURL(file.raw)
+      }
+      this.videoSave.push(json)
+      this.videoInfo.title = ''
     },
     // 点击上传完成的列表文件
     showVideo (file) {
@@ -379,7 +560,28 @@ export default {
     // 上传失败
     uploadError (err, file, fileList) {
       console.log(err)
+      this.$message.error('视频上传失败，请重新上传！')
+    },
+
+    fabu () {
+      this.$message({
+        message: '发布成功',
+        type: 'success'
+      })
+      this.stepActive = 0
+      for (let key in this.formCourse) {
+        this.formCourse[key] = ''
+      }
+      this.videoInfo.title = ''
+      this.geFirstVary()
+      this.getTeachers()
+    },
+    watchViedo (item) {
+      this.dialogTableVisible = true
+      this.currentvideoInfo = item.title
+      this.currentvideoSrc = item.videoSrc
     }
+
   }
 }
 </script>
@@ -455,4 +657,25 @@ export default {
   border-left: 2px solid #f56c6c;
   padding-left: 4px;
 }
+.el-upload-list__item-name {
+  color: #606266;
+  /* display: block; */
+  margin-right: 20px;
+  overflow: hidden;
+  padding-left: 4px;
+  text-overflow: ellipsis;
+  transition: color .3s;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+}
+.el-upload-list__item-name [class^=el-icon] {
+  height: 100%;
+  margin-right: 7px;
+  color: #909399;
+  line-height: inherit;
+}
+  .el-upload-list__item-name:hover{
+    color: #409eff;
+  }
 </style>

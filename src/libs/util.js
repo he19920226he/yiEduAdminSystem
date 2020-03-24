@@ -4,18 +4,20 @@
  * @Author: lxw
  * @Date: 2019-11-05 11:10:56
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-21 20:03:42
+ * @LastEditTime: 2020-03-24 02:40:10
  */
 import cookies from './util.cookies'
 import db from './util.db'
 import log from './util.log'
 import menuFormate from './util.menu.formate'
+import netconnect from './util.netconnect'
 
 const util = {
   cookies,
   db,
   log,
-  menuFormate
+  menuFormate,
+  netconnect
 }
 
 /**

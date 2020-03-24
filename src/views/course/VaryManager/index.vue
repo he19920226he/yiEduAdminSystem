@@ -1,330 +1,370 @@
-<!--
- * @Description:
- * @version:
- * @Author: lxw
- * @Date: 2019-11-06 11:06:15
- * @LastEditors: lxw
- * @LastEditTime: 2019-12-04 10:42:44
- -->
 <template>
   <d2-container>
-    <template slot="header">课程类别管理</template>
-    <div class="VaryManager">
+    <template slot="header">分类查询</template>
+  <div class="VaryManager">
+    <div class="main-body">
+
       <el-row class="d2-mb-10" :gutter="40">
-        <el-col :span="8">
-        <el-input
-            @keyup.enter.native="searchByKeyword"
-            placeholder="请输入分类名称"
-            prefix-icon="el-icon-search"
-            v-model="searchInfo.keyword"
+        <el-col :span="6">
+          <el-input
+                  placeholder="请输入分类名称"
+                  prefix-icon="el-icon-search"
+                  v-model="searchInfo.varyName"
           ></el-input>
         </el-col>
         <el-col :span="6">
-            <el-button type="primary"><span class="el-icon-circle-plus"></span> 添加</el-button>
+          <el-select placeholder="请选择级别"  v-model="selectVal" style="width:100%!important;" @change="changeLevel()">
+            <el-option label="一级类别" :value="2"></el-option>
+            <el-option label="二级类别" :value="3"></el-option>
+             <el-option label="三级类别" :value="4"></el-option>
+          </el-select>
         </el-col>
+<!--        <el-col :span="6" style="text-align: left;padding-left: -50px!important;">-->
+<!--          <el-button type="primary" icon="el-icon-search" size="small" @click="searchTeachers">查询</el-button>-->
+<!--          <el-button  icon="el-icon-refresh" size="small" @click="reset">重置</el-button>-->
+<!--        </el-col>-->
       </el-row>
-      <el-row class="d2-mb-10">
-        <p class="info">课程类别信息</p>
+
+      <el-row style="margin-top: 30px;">
+        <el-col :span="20" :offset="2">
+          <el-tree
+                  :data="data"
+                  node-key="id"
+                  default-expand-all
+                  @node-drag-start="handleDragStart"
+                  @node-drag-enter="handleDragEnter"
+                  @node-drag-leave="handleDragLeave"
+                  @node-drag-over="handleDragOver"
+                  @node-drag-end="handleDragEnd"
+                  @node-drop="handleDrop"
+                  draggable
+                  :allow-drop="allowDrop"
+                  :allow-drag="allowDrag"
+                  :expand-on-click-node="false">
+      <span class="custom-tree-node" slot-scope="{ node, data }">
+        <span>{{ node.label }}</span>
+        <span class="operate">
+          <i class="el-icon-edit" @click="() => edit(data)"></i>
+
+           <i style="display: inline-block; margin-left: 10px;" class="el-icon-delete"  @click="() => remove(node, data)"></i>
+        </span>
+      </span>
+          </el-tree>
+        </el-col>
+
       </el-row>
-      <!-- 封装的本系统的全局表格组件 -->
-      <table-page
-        :tableDatas="showDatas.prizeDatas"
-        :tableHeader="showDatas.prizeAttributs"
-        :operateWay="showDatas.operateData"
-        :pageInfos="showDatas.pageInfos"
-        @operate="operateFun"
-        @changePageSize="changeSize"
-        @changCurrentePage="changPage"
-      />
 
-      <!-- 编辑管理员信息,表单组件类型很多不好像封装表格那样。所以这里就不全局封装了，数据封装一下就行 -->
-      <el-dialog title="编辑权限信息" :visible.sync="dialogFormVisible">
-        <el-form
-          :model="formPermission"
-          :rules="rules"
-          ref="formPermission"
-          class="demo-form-inline"
-        >
-          <el-row :gutter="25">
-            <el-col :span="12">
-              <el-form-item label="所属功能模块" prop="parenttitle">
-                <el-input v-model="formPermission.parenttitle" placeholder="所属功能模块"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="所属功能模块路由" prop="parenName">
-                <el-input v-model="formPermission.parenName" placeholder="所属功能模块路由"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-
-          <el-row :gutter="25">
-            <el-col :span="12">
-              <el-form-item label="权限名称" prop="name">
-                <el-input v-model="formPermission.name" placeholder="权限名称"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="权限页面路由" prop="parenttitle">
-                <el-input v-model="formPermission.url" placeholder="页面路由"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="25">
-            <el-col :span="12">
-              <el-form-item label="权限页面标题" prop="title">
-                <el-input v-model="formPermission.title" placeholder="权限页面标题"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="权限功能模块页面图标" prop="icon">
-                <el-input v-model="formPermission.icon" placeholder="权限功能模块页面图标" disabled></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-          <el-col :span="24">
-            <ul class="icon-list">
-              <li
-                class="icon-item"
-                v-for="(item,index) in menuIcons"
-                :key="index"
-                @click="selectIcon(item)"
-              >
-                <i
-                  :class="[item.iconBaseClass,item.iconName]"
-                  aria-hidden="true"
-                  style="font-size:32px;color:#666;"
-                ></i>
-                <span class="icon-name" v-text="item.iconName"></span>
-              </li>
-            </ul>
-          </el-col>
-        </el-row>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-        </div>
-      </el-dialog>
     </div>
+
+    <!-- 编辑类别信息 -->
+    <el-dialog title="编辑类别信息" :visible.sync="dialogFormVisible">
+      <el-form :model="varyForm" :rules="rules" ref="varyForm" class="demo-form-inline">
+        <el-form-item label="类别名称" prop="varyName">
+          <el-input v-model="varyForm.varyName" placeholder="分裂名称"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editSubmission">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
   </d2-container>
 </template>
 
 <script>
-import getMenuIcons from '../../../menu/menuIcon'
+
+import { selectAllVary } from '@/api/course-vary/selectAll.js'
+import { getHigherLevel } from '@/api/course-vary/getHigherLevel.js'
+import { updateVary } from '@/api/course-vary/updateVary.js'
 export default {
   name: 'VaryManager',
   data () {
-    return {
-      searchInfo: {
-        keyword: '',
-        size: '', // 分页的每一页数目
-        indexPageNum: '' // 当前分页的页码
-      },
-      // 页面需要渲染的数据:包括当前页面以及制作复用子组件，渲染的数据是需要传递给子组件的。
-      showDatas: {
-        prizeDatas: [],
-        // 定义表格头部数据：一般是固定自己需要的几个字段:所以可以直接在这里定义:也算是定义渲染的模板对象
-        prizeAttributs: [
-          {
-            attributes: 'prize_id',
-            name: '物品编码',
-            // 配置每一列的宽度，如果是为了全屏显示的话最后一个不要配置宽度
-            width: '250'
-          },
-          {
-            attributes: 'pname',
-            name: '物品名称',
-            width: '250'
-          },
-          {
-            attributes: 'integral',
-            name: '所需积分额度',
-            width: ''
-          }
-        ],
-        // 这里需要表格的尾列显示编辑、删除按钮:如果不需要显示操作列，请给它赋值false：实现是通过v-if="operateData"
-        operateData: [
-          {
-            name: '编辑',
-            icon: 'el-icon-edit',
-            type: '' // 按钮样式类型
-          },
-          {
-            name: '删除',
-            icon: 'el-icon-delete',
-            type: 'danger' // 按钮样式类型
-          }
-        ],
-        //  operateData:false
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入类别名称'))
+      } else {
+        callback()
+      }
+    }
 
-        // 分页信息：传递分页信息控制子组件分页器的渲染,当不需要显示分页控件的时候：比如页数为1或者是没有分页
-        // 手动设置 isShowPage:false
-        pageInfos: {
-          totalPage: 0, // 总数
-          pageSize: [], // 定义可以调整每一页显示数目
-          isShowPage: false // false：不显示分页控件
-        },
-        loadinInfo: {
-          isLoading: false,
-          info: '确定修改'
-        }
-      },
+    return {
       dialogFormVisible: false,
-      // 表单相关：数据、验证
-      formPermission: {
-        permission_id: '',
-        parentName: '',
-        url: '',
-        name: '',
-        title: '', // 保存选中的权限
-        icon: '',
-        parenttitle: ''
+      selectVal: '',
+      searchInfo: {
+        varyName: '',
+        size: 6, // 分页的每一页数目
+        indexPageNum: 1, // 当前分页的页码
+        vary: ''
+      },
+      currentContentNName: '查询机构', // 通过路由传参数实现
+      searchVal: '',
+      data: [],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+      isSelect: true,
+      varyForm: {
+        // element-ui自定义表单验证的输入框的name属性
+        varyName: '',
+        id: ''
       },
       rules: {
-        parentName: [
-          { required: true, message: '请输入权限名称', trigger: 'blur' }
-        ],
-        name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
-        url: [
-          {
-            required: true,
-            message: '请输入权限页面路由名称',
-            trigger: 'blur'
-          },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
-        ],
-        title: [
-          { required: true, message: '请输入权限页面标题', trigger: 'blur' }
-        ],
-        icon: [{ required: true, message: '请输入页面图标', trigger: 'blur' }],
-        parenttitle: [
-          { required: true, message: '请输入页面图标', trigger: 'blur' }
-        ]
+        varyName: [{ validator: validatePass, trigger: 'blur' }]
       },
-      menuIcons: []
+      varyDatas: []// 修改需要
     }
   },
+
   mounted () {
-    let loading = this.$myLoading('切换中')
-    setTimeout(() => {
-      loading.close()
-      this.menuIcons = getMenuIcons()
-      this.showDatas.pageInfos.totalPage = 3
-      this.showDatas.pageInfos.isShowPage = true
-    }, 500)
+    this.searchVarys()
   },
+
   methods: {
-    searchByKeyword () {
-      console.log(this.searchInfo.keyword)
-    },
-    // 子组件通过emit触发@xxx事件，函数定义在这里，接受到子组件传递的数据之后写相关业务逻辑
-    operateFun (ind, type) {
-      if (type === '编辑') {
-        let loading = this.$myLoading('数据加载中...')
+    searchVarys () {
+      let loading = this.$myLoading('查询中...')
+      selectAllVary().then(res => {
+        // 构建类别数据的树状结构
+        this.dataTree(res)
         loading.close()
-        this.dialogFormVisible = !this.dialogFormVisible
-        //! 信息回显到表单:注意表格的一条记录数据从后台获取，但是我们通过字段过滤显示部分数据。但是记录里面是全部的信息，目的是为了
-        //! 回显信息到表单。
-        let curetnInfo = this.showDatas.roleDatas[ind]
-        console.log(curetnInfo['id'])
-        for (const key in this.formRole) {
-          if (this.formRole.hasOwnProperty(key) && key !== 'permisionIds') {
-            this.formRole[key] = curetnInfo[key]
+      }).catch(errs => {})
+    },
+    dataTree (res) {
+      console.log(res)
+      let data = []
+      this.varyDatas = res.data
+      for (let i = 0; i < res.data.length; i++) {
+        if (res.data[i].level === 1) {
+          let json = {
+            label: res.data[i].kindName,
+            id: res.data[i].kid,
+            level: 1,
+            children: []
+          }
+          data.push(json)
+        }
+      }
+
+      for (let i = 0; i < res.data.length; i++) {
+        if ((res.data[i].level === 2)) {
+          for (let j = 0; j < data.length; j++) {
+            if (data[j].id === res.data[i].higherId) {
+              data[j].children.push({
+                label: res.data[i].kindName,
+                id: res.data[i].kid,
+                level: 2,
+                children: []
+              })
+            }
           }
         }
-      } else {
-        //  删除信息
-        this.$confirm('此操作将删除管理员, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(() => {
-            // 删除管理员
-            let adminerId = this.showDatas.adminerDatas[ind].id
-            console.log(adminerId)
-          })
-          .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            })
-          })
+      }
+      for (let i = 0; i < res.data.length; i++) {
+        if ((res.data[i].level === 3)) {
+          for (let j = 0; j < data.length; j++) {
+            for (let k = 0; k < data[j].children.length; k++) {
+              if (data[j].children[k].id === res.data[i].higherId) {
+                data[j].children[k].children.push({
+                  label: res.data[i].kindName,
+                  id: res.data[i].kid,
+                  level: 2,
+                  children: []
+                })
+              }
+            }
+          }
+        }
+      }
+      console.log(data)
+      this.data = data
+    },
+    changeLevel () {
+      console.log(this.selectVal)
+      getHigherLevel(this.selectVal).then((result) => {
+        console.log(result)
+        let data = []
+        for (let i = 0; i < result.data.length; i++) {
+          const element = result.data[i]
+          let json = {
+            label: element.kindName,
+            id: element.kid,
+            level: element.level,
+            children: []
+          }
+          data.push(json)
+        }
+        this.data = data
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+
+    // 树节点拖拽，修改对应的级别需要
+    handleDragStart (node, ev) {
+      console.log('drag start', node)
+    },
+    handleDragEnter (draggingNode, dropNode, ev) {
+      console.log('tree drag enter: ', dropNode.label)
+    },
+    // TODO:leave哪一个就是我们需要的插入的类别，也就是当前拖拽的节点的新分类
+    handleDragLeave (draggingNode, dropNode, ev) {
+      console.log('当前插入的新的父类: ', dropNode.label)
+    },
+    handleDragOver (draggingNode, dropNode, ev) {
+      console.log('tree drag over: ', dropNode.label)
+    },
+    handleDragEnd (draggingNode, dropNode, dropType, ev) {
+      console.log('tree drag end: ', dropNode && dropNode.label, dropType)
+    },
+    handleDrop (draggingNode, dropNode, dropType, ev) {
+      console.log('tree drop: ', dropNode.label, dropType)
+    },
+    // 都采用inser模式，运行拖拽节点插入在level = 1 的
+    allowDrop (draggingNode, dropNode, type) {
+      return type !== 'inner'
+    },
+    // 判断节点能否被拖拽，如果当前的节点不允许被拖拽的话返回true
+    allowDrag (draggingNode) {
+      return draggingNode.data.level !== 1
+    },
+
+    // 对应的类别操纵
+    edit (data) {
+      console.log(data)
+      this.varyForm.varyName = data.label
+      this.varyForm.id = data.id
+      this.dialogFormVisible = true
+      // const newChild = { id: id++, label: 'testtest', children: [] }
+      // if (!data.children) {
+      //   this.$set(data, 'children', [])
+      // }
+      // data.children.push(newChild)
+    },
+
+    remove (node, data) {
+      this.$message({
+        type: 'info',
+        message: '功能模块暂未开放'
+      })
+    },
+
+    handleNodeClick (data) {
+      console.log(data)
+      this.isSelect = false;
+      [this.isShowLevel1, this.isShowLevel2] = this.getBol(data.level)
+    },
+    getBol (val) {
+      if (val === 1) {
+        return [false, false]
+      } else if (val === 2) {
+        return [true, false]
+      } else if (val === 3) {
+        return [true, true]
       }
     },
-    /**
-     * @description:改变每页显示的条数，重新发送请求。
-     * @param {type}
-     * @return:
-     */
-    changeSize (size) {
-      console.log(`每页 ${size} 条`)
-      this.searchInfo.size = size
-      this.searchByKeyword()
+    editSubmission () {
+      let loading = this.$myLoading('修改中...')
+      console.log(this.varyForm)
+      let data = null
+      for (let i = 0; i < this.varyDatas.length; i++) {
+        if (this.varyDatas[i].kid === this.varyForm.id) {
+          data = this.varyDatas[i]
+          break
+        }
+      }
+      data.kindName = this.varyForm.varyName
+      console.log(data)
+      updateVary(data).then(res => {
+        loading.close()
+        this.searchVarys()
+      }).catch(errs => { loading.close() })
     },
-    /**
-     * @description: 改变当前的页码
-     * @param {type}
-     * @return:
-     */
-    changPage (currentPage) {
-      console.log(`当前页码:${currentPage}`)
-      this.searchInfo.indexPageNum = currentPage
-      this.searchByKeyword()
+    deleteMechanism () {
+      this.$confirm('是否确认删除该机构, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
-    handleChange (value, direction, movedKeys) {
-      console.log(value, direction, movedKeys)
-      //! value就是当前被分配的所有的权限id
+    submitForm1 (formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          alert('submit!')
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm1 (formName) {
+      this.$refs[formName].resetFields()
+    },
+    reset () {
+      for (let key in this.searchInfo) {
+        if (key === 'size' || key === 'indexPageNum') {
+          console.log(111)
+        } else {
+          this.searchInfo[key] = ''
+        }
+      }
     }
   }
 }
+
 </script>
-<style lang="css" scoped>
-.icon-list {
-  overflow: hidden;
-  list-style: none;
-  padding: 0 !important;
-  width: 100%;
-}
-.icon-list li {
-  float: left;
-  width: 14%;
-  text-align: center;
-  height: 101px;
-  padding-top: 40px;
-  color: #666;
-  font-size: 13px;
-  border: 1px solid #ddd;
-  margin-right: -1px;
-  margin-bottom: -1px;
-  cursor: pointer;
-}
-.icon-list li span {
-  line-height: normal;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
-    Microsoft YaHei, SimSun, sans-serif;
-  color: #99a9bf;
-  transition: color 0.15s linear;
-}
-.icon-list li i {
-  display: block;
-  font-size: 32px;
-  margin-bottom: 15px;
-  color: #606266;
-  transition: color 0.15s linear;
-}
-.icon-list li .icon-name {
-  display: inline-block;
-  padding: 0 3px;
-  height: 1em;
-  transition: color 0.15s linear;
-}
-.icon-list li:hover i {
-  color: #1989fa !important;
-}
-.icon-list li:hover span {
-  color: #1989fa !important;
-}
+
+<style scoped>
+  .mg1 {
+    margin-top: 0px !important;
+  }
+
+  .operatio {
+    margin-top: -10px;
+    margin-left: 65px;
+  }
+
+  .operatio h4 {
+    margin-top: -5px;
+    margin-left: 15px;
+    float: left;
+  }
+
+  .operatio .el-button {
+    margin-top: -35px !important;
+    width: 35px;
+    height: 35px;
+    padding: 8px;
+    margin-left: 10px;
+
+  }
+  .form-wrap{
+    margin-left: -30px;
+    margin-top: 10px;
+  }
+  .form-wrap .change-select{
+    width: 100%;
+  }
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
+  .operate i:hover{
+    color: #409EFF;
+  }
+
 </style>

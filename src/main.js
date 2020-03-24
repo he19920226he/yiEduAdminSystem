@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-05 11:10:56
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-21 17:04:15
+ * @LastEditTime: 2020-03-24 02:44:48
  */
 // Vue
 import Vue from 'vue'
@@ -15,10 +15,13 @@ import d2Admin from '@/plugin/d2admin'
 // store
 import store from '@/store/index'
 
+import { Message } from 'element-ui'
+
 // 菜单和路由设置
 import router from './router'
 import menuHeader from '@/menu/header'
 import { frameInRoutes } from '@/router/routes'
+import util from '@/libs/util.js'
 // import { Message } from 'element-ui'
 
 Vue.prototype.$myLoading = function (string) {
@@ -29,6 +32,23 @@ Vue.prototype.$myLoading = function (string) {
     background: 'rgba(0, 0, 0, 0.7)'
   })
 }
+
+console.log(process.env.NODE_ENV)
+
+// 监听网络变化--移动端基本兼容，pc端谷歌浏览器需要12以上
+util.netconnect(function () {
+  Message({
+    message: '网络恢复正常',
+    type: 'success',
+    duration: 5 * 1000
+  })
+}, function () {
+  Message({
+    message: '当前网络已经断开，请检查网络连接',
+    type: 'error',
+    duration: 5 * 1000
+  })
+})
 
 // TODO:导入登录判断接口调用模块，判断是否登录
 let isLogin = false

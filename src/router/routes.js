@@ -128,6 +128,15 @@ const frameIn = [
         },
         component: _import('course/VaryManager')
       },
+      {
+        path: 'addVary',
+        name: 'addVary',
+        meta: {// 标签栏显示
+          title: '添加分类',
+          auth: true
+        },
+        component: _import('course/addVary')
+      },
       // 积分管理模块
       {
         path: 'searchIntegral',
@@ -156,6 +165,16 @@ const frameIn = [
           auth: true
         },
         component: _import('comment/searchComment')
+      },
+      // 测试页面
+      {
+        path: 'test',
+        name: 'test',
+        meta: {// 标签栏显示
+          title: '新页面',
+          auth: true
+        },
+        component: _import('comment/test')
       },
       {
         path: 'move',

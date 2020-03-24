@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-07 21:52:04
+ * @LastEditTime: 2020-03-22 16:24:49
  -->
 <template>
   <div class="adminer">
@@ -289,6 +289,15 @@ export default {
       updateUser(this.formAdminer).then(res => {
         console.log(res)
         this.searchByKeyword()
+        // 登录账号vuex存储的状态更新
+        this.$store.dispatch('d2admin/user/set',
+          {
+            name: this.formAdminer.name
+          },
+          {
+            root: true
+          }
+        )
         this.dialogFormVisible = false
         loading.close()
       }).catch(errs => { loading.close() })

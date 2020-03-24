@@ -9,7 +9,9 @@
     "build:nomock": "vue-cli-service build --mode nomock",
     "build:travis": "vue-cli-service build --mode travis",
     "lint": "vue-cli-service lint --fix",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "upload": "node upload.js",
+    "deploy": "npm run build && npm run upload"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -49,6 +51,7 @@
     "eslint-plugin-vue": "^5.2.2",
     "sass": "^1.21.0",
     "sass-loader": "^7.1.0",
+    "scp2": "^0.5.0",
     "svg-sprite-loader": "^4.1.6",
     "text-loader": "0.0.1",
     "vue-cli-plugin-i18n": "^0.6.0",

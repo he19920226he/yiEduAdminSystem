@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-07 21:50:22
+ * @LastEditTime: 2020-03-23 23:05:30
  -->
 <template>
   <div class="adminer">
@@ -52,7 +52,7 @@
       @changePageSize="changeSize"
       @changCurrentePage="changPage"
     />
-       <!-- 编辑管理员信息,表单组件类型很多不好像封装表格那样。所以这里就不全局封装了，数据封装一下就行 -->
+       <!-- 编辑管理员信息,通过这里的测试删除表单组件类型很多不好像封装表格那样。所以这里就不全局封装了，数据封装一下就行 -->
     <el-dialog title="编辑管理员信息" :visible.sync="dialogFormVisible">
       <el-form :inline="true" :model="formUser" :rules="rules" ref="formUser" class="demo-form-inline">
         <el-form-item label="用户名称" prop="stuname">
@@ -123,7 +123,7 @@ export default {
       }
     }
     var checkEmail = (rule, value, callback) => {
-      var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+      var reg = /^([a-zA-Z]|[0-9])(\w|-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
       if (!reg.test(value)) {
         callback(new Error('邮箱格式不对'))
       } else {
@@ -172,6 +172,11 @@ export default {
           {
             attributes: 'phone',
             name: '学生电话',
+            width: '130'
+          },
+          {
+            attributes: 'registertime',
+            name: '学生注册时间',
             width: ''
           }
         ],
@@ -270,6 +275,8 @@ export default {
           this.showDatas.userDatas = res.data
           for (let i = 0; i < this.showDatas.userDatas.length; i++) {
             this.showDatas.userDatas[i].state = this.showDatas.userDatas[i].state === 0 ? '正常' : '禁用'
+            // 注册时间：毫秒转正常的时间格式
+            this.showDatas.userDatas[i].registertime = this.DateFormate(this.showDatas.userDatas[i].registertime)
             for (let key in this.showDatas.userDatas[i]) {
               if (this.showDatas.userDatas[i][key] === null) {
                 this.showDatas.userDatas[i][key] = '暂无信息'
@@ -288,11 +295,16 @@ export default {
         isShowPage: isShow
       }
     },
+    // 毫秒转时间格式
+    DateFormate (time) {
+      var date = new Date(time)
+      return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDay() < 10 ? '0' + (date.getDay() + 1) : date.getDay() + 1}`
+    },
     getQuery () {
       // 根据不为空的字段获取实际的query
       let obj = {}
       for (let key in this.searchInfo) {
-        if (this.searchInfo[key] !== '') {
+        if (this.searchInfo[key] !== '' && this.searchInfo[key] !== null) {
           if (key === 'size') {
             obj['pageSize'] = this.searchInfo[key]
           } else if (key === 'indexPageNum') {

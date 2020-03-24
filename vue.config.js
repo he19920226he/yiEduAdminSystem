@@ -11,16 +11,17 @@ process.env.VUE_APP_VERSION = require('./package.json').version
 process.env.VUE_APP_BUILD_TIME = require('dayjs')().format('YYYY-M-D HH:mm:ss')
 
 // 基础路径 注意发布之前要先修改这里
-let publicPath = process.env.VUE_APP_PUBLIC_PATH || '/'
+// 打包后dist文件夾的路徑
+let publicPath = process.env.VUE_APP_PUBLIC_PATH || './'
 
 module.exports = {
   // 根据你的实际情况更改这里
   publicPath,
   lintOnSave: true,
   devServer: {
-    proxy: { // http://localhost:8088/
+    proxy: { // http://localhost:8088/ http://106.15.250.119:8080/YIedu/
       '/': {
-        target: 'http://localhost:8088',
+        target: 'http://47.103.223.248:8080/YIedu/',
         ws: true,
         changeOrigin: true
         // pathRewrite: {

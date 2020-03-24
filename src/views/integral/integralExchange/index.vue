@@ -4,12 +4,13 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-12-04 09:11:29
+ * @LastEditTime: 2020-03-22 20:41:07
  -->
 <template>
   <d2-container>
     <template slot="header">积分兑换</template>
     <div class="integralExchange">
+      <h4 class="center">抱歉，功能模块暂未开发，敬请期待!</h4>
       <el-row class="d2-mb-10" :gutter="40">
         <el-col :span="8">
           <el-input
@@ -282,6 +283,11 @@ export default {
 }
 </script>
 <style lang="css" scoped>
+.center{
+  text-align: center;
+  margin-bottom: 50px;
+  color: #E6A23C;
+}
 .icon-list {
   overflow: hidden;
   list-style: none;

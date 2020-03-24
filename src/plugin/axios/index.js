@@ -34,11 +34,17 @@ function errorLog (error) {
 }
 
 // 创建一个 axios 实例
+// 在这里简单通过process.env.NODE_ENV环境变量判断当前是开发环境还是生产环境：动态修改接口地址
+// 部署后vue-cli3的跨域配置失效，此时我本地通过ngnix配置代理跨域：代理服务器地址是local:8888，映射真实接口地址。所以build后的地址改为http://localhost:8888/YIedu/
+// 现在更新部署上线后的接口地址baseurl为http://106.15.250.119:8090/YIedu/,是因为现在项目是部署到了后台服务器上的nginx静态资源服器里面了，也就是服务器linxu里面安装了nginx，同你本地安装启动配置代理跨域类似
+// 服务器的nginx启动是服务器ip + 端口号8090 ，所以我接口也是
 const service = axios.create({
-  baseURL: process.env.VUE_APP_API,
-  withCredentials: true,
+  baseURL: process.env.NODE_ENV === 'development' ? process.env.VUE_APP_API : 'http://47.103.223.248:8095/YIedu/', // 部署仍然不是那種部署到服務器後臺項目目錄，也就是部署到服務器，
+  withCredentials: true, // 但是不是後臺工程目錄的webapp目錄，仍然存在跨域問題，
+  // 怎麽說呢，就是這是完全的前後端分類了，可能後臺需要一個靜態資源服務器托管前端項目，所以仍然需要解決跨域問題。
   timeout: 5000 // 请求超时时间
 })
+console.log('目前请求接口前缀', process.env.VUE_APP_API)
 
 // 请求拦截器
 service.interceptors.request.use(
@@ -66,10 +72,8 @@ service.interceptors.response.use(
     const { code } = dataAxios
     // 根据 code 进行判断
     if (code === undefined) {
-      // 如果没有 code 代表这不是项目后端开发的接口 比如可能是 D2Admin 请求最新版本
       return dataAxios
     } else {
-      // 有 code 代表这是一个后端接口 可以进行进一步的判断
       switch (code) {
         case 1028:
           // code === 1028 代表没有错误
@@ -107,9 +111,9 @@ service.interceptors.response.use(
         case 505: error.message = 'HTTP版本不受支持'; break
         default: break
       }
-      error.message = '网络连接错误或服务器内部错误'
+      error.message = '网络连接错误或服务器内部错误，请检查网络重新试试或联系1143167344@qq.com'
     }
-    error.message = '网络连接错误或服务器内部错误'
+    error.message = '网络连接错误或服务器内部错误，请检查网络重新试试或联系1143167344@qq.com'
     errorLog(error)
     return Promise.reject(error)
   }

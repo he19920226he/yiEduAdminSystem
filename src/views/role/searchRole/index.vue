@@ -62,7 +62,9 @@
 <script>
 import { selectAllRole, selectRoleByName } from '@/api/role/searchRole.js'
 import { selectAll } from '@/api/permission/searchPermision'
-import { updatePermision } from '@/api/permission/updatePermision.js'
+import { searchPermisionByRole } from '@/api/role-permision/searchPermisionByRole.js'
+import { addPermisionRole } from '@/api/role-permision/addPermisionRole.js'
+import { deleteRolePermison } from '@/api/role-permision/deleteRolePermison.js'
 import { updateRole } from '@/api/role/updateRole.js'
 import { deleteRole } from '@/api/role/deleteRole.js'
 import { LoginAdmin } from '@/api/sys.login.js'
@@ -73,8 +75,8 @@ export default {
     return {
       searchInfo: {
         keyword: '',
-        size: '', // 分页的每一页数目
-        indexPageNum: '' // 当前分页的页码
+        size: 6, // 分页的每一页数目
+        indexPageNum: 1 // 当前分页的页码
       },
       // 页面需要渲染的数据:包括当前页面以及制作复用子组件，渲染的数据是需要传递给子组件的。
       showDatas: {
@@ -125,7 +127,8 @@ export default {
       formRole: {
         roleId: '',
         name: '',
-        permisionIds: []// 保存分配的权限
+        permisionIds: [], // 保存分配的权限
+        rolePermisionIds: []
       },
       rules: {
         name: [
@@ -220,8 +223,7 @@ export default {
               this.permisions.push(res.data[i])
               let obj = {
                 key: res.data[i].permissionId,
-                label: res.data[i].title,
-                disabled: this.formRole.roleId === 1
+                label: res.data[i].title
               }
               this.permisionData.push(obj)
             }
@@ -235,6 +237,8 @@ export default {
         }
         console.log(this.permisionData)
         // 根据角色id判断在这里权限中该角色是被分配是了多少
+        // this.searchRolePermision(this.formRole.roleId)
+        // 根据角色id获取当前角色被分配的权限
         this.searchRolePermision(this.formRole.roleId)
       }).catch(err => {
         console.log(err)
@@ -308,12 +312,28 @@ export default {
     // 根据角色id判断当前角色拥有哪些权限
     searchRolePermision (roleId) {
       this.formRole.permisionIds = []
-      for (let i = 0; i < this.permisions.length; i++) {
-        if (this.permisions[i].roleandpermission >= roleId) {
-          console.log(this.permisions[i].roleandpermission)
-          this.formRole.permisionIds.push(this.permisions[i].permissionId)
-        }
+      this.formRole.rolePermisionIds = []
+      // for (let i = 0; i < this.permisions.length; i++) {
+      //   if (this.permisions[i].roleandpermission >= roleId) {
+      //     console.log(this.permisions[i].roleandpermission)
+      //     this.formRole.permisionIds.push(this.permisions[i].permissionId)
+      //   }
+      // }
+      let data = {
+        pageNum: 1,
+        pageSize: 1000,
+        roleId: roleId
       }
+      searchPermisionByRole(data).then(res => {
+        console.log(res)
+        if (res.data == null) {
+          return
+        }
+        for (let i = 0; i < res.data.length; i++) {
+          this.formRole.permisionIds.push(res.data[i].permissionId)
+          this.formRole.rolePermisionIds[res.data[i].permissionId] = res.data[i].rolePermissionId
+        }
+      }).catch(errs => {})
     },
     /**
      * @description:改变每页显示的条数，重新发送请求。
@@ -378,18 +398,20 @@ export default {
         // 分配权限
         data = {
           'permissionId': id,
-          'roleandpermission': this.formRole.roleId
+          'roleId': this.formRole.roleId
         }
+        addPermisionRole(data).then(res => {
+          console.log(res)
+        }).catch(errs => {})
       } else if (type === 'left') {
         // 取消权限
         data = {
-          'permissionId': id,
-          'roleandpermission': this.formRole.roleId - 1
+          'id': this.formRole.rolePermisionIds[id]
         }
+        deleteRolePermison(data).then(res => {
+
+        }).catch(errs => {})
       }
-      updatePermision(data).then(res => {
-        console.log(res)
-      }).catch(errs => {})
     },
     // 确认修改
     editSubmission () {
