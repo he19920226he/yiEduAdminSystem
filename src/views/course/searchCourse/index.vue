@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-12-12 02:00:37
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-24 17:06:13
+ * @LastEditTime: 2020-03-25 00:47:45
  -->
 <!--
  * @Description:
@@ -90,7 +90,7 @@
       />
 
       <!-- TODO:看看这里的备注：关于进入课程的编辑页面：tab:分为基本信息编辑、课程视频编辑、课程试题编辑。这样课程列表的操作：编辑、删除编辑管理员信息,表单组件类型很多不好像封装表格那样。所以这里就不全局封装了，数据封装一下就行 -->
-      <el-dialog title="编辑课程信息" :visible.sync="dialogFormVisible" width='70%'>
+      <el-dialog title="编辑课程信息" :visible.sync="dialogFormVisible" width='70%' >
         <el-tabs v-model="activeName" @tab-click="handleClick">
 
           <el-tab-pane label="课程基本信息" name="first">
@@ -212,8 +212,8 @@
           </el-tab-pane>
           <el-tab-pane label="上传新视频" name="third">
 
-            <el-row >
-              <el-col :span="12" :offset="4">
+            <el-row style="padding-right:250px;">
+              <el-col :span="12" :offset="6" style="min-width:300px;">
 
                 <el-form :model="videoInfo" :rules="videoRules" ref="videoInfo" label-width="100px" class="demo-ruleForm">
                   <el-form-item label="视频标题" prop="title">
@@ -223,8 +223,8 @@
 
               </el-col>
             </el-row>
-            <el-row :gutter="10" style="padding-left: 120px!important;">
-              <el-col :span="12" :offset="4">
+            <el-row :gutter="10" style="padding-right:270px;">
+              <el-col :span="12" :offset="8" style="min-width:300px;">
                 <el-upload
                         class="upload-demo"
                         drag
@@ -233,6 +233,7 @@
                         :action="uploadUrl"
                         :on-success="handleVideoSuccess"
                         :before-upload="beforeUploadVideo"
+                        :on-progress="videoProgress"
                         :on-preview="showVideo"
                         :on-error="uploadError"
                 >
@@ -245,9 +246,18 @@
                 </el-upload>
               </el-col>
             </el-row>
-            <el-row :gutter="10"  style="padding-left: 50px!important;">
-              <el-col :span="12" :offset="4">
-                <video v-if="videoSrc!==''" :src="videoSrc" id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='width: 100%;height: auto'>
+            <!-- 视频上传进度条 -->
+            <el-row style="padding-right:190px;" v-if="isUpload">
+             <el-col :span="14" :offset="6" style="min-width:300px;">
+
+               <el-progress :percentage="uploadProgess"></el-progress>
+
+              </el-col>
+
+            </el-row>
+            <el-row :gutter="10" style="padding-left:20px;">
+              <el-col :span="12" :offset="4" style="min-width:300px;">
+                <video v-if="videoSrc!==''" :src="videoSrc" id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='width:100%; height: auto;'>
                   您的浏览器不支持视频播放
                 </video>
               </el-col>
@@ -441,6 +451,8 @@ export default {
       // 视频上传地址 mounted钩子处加全局环境变量保存的baseurl
       uploadUrl: 'videoInfo/upload',
       videoSrc: '', // 上传视频完成后返回的视频地
+      uploadProgess: 0, // 视频上传进度
+      isUpload: false, // 是否正在上传视频
       videoRules: {
         title: [
           { required: true, message: '请输入视频标题名称', trigger: 'blur' },
@@ -462,7 +474,7 @@ export default {
       // this.uploadUrl = process.env.VUE_APP_API + this.uploadUrl
       this.uploadUrl = `http://localhost:8080/${this.uploadUrl}`
     } else if (process.env.NODE_ENV === 'production') {
-      this.uploadUrl = `http://47.103.223.248:8080/YIedu/${this.uploadUrl}`
+      this.uploadUrl = `http://47.103.223.248:8095/YIedu/${this.uploadUrl}`
     }
 
     console.log(this.uploadUrl)
@@ -689,7 +701,7 @@ export default {
         }
       } else {
         //  删除信息
-        this.$confirm('此操作将删除管理员, 是否继续?', '提示', {
+        this.$confirm('此操作将删除此课程, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -769,7 +781,6 @@ export default {
     beforeUploadVideo (file) {
       this.$refs['videoInfo'].validate((valid) => {
         if (valid) {
-
         } else {
           // 没有用
           return false
@@ -779,6 +790,15 @@ export default {
         this.$message.error('视频标题信息不能为空，请先填写标题信息')
         return false
       }
+      const isLt600M = file.size / 1024 / 1024 > 600
+      if (isLt600M) {
+        this.$message.error('视频大小不能超过600MB')
+        return false
+      }
+    },
+    // 视频上传进度监听
+    videoProgress (event, file, fileList) {
+      console.log(0)
     },
     // 上传成功后显
     handleVideoSuccess (res, file) {
@@ -812,7 +832,7 @@ export default {
   }
 }
 </script>
-<style lang="css" scoped>
+<style lang="css" >
 .icon-list {
   overflow: hidden;
   list-style: none;
@@ -857,5 +877,8 @@ export default {
 }
 .icon-list li:hover span {
   color: #1989fa !important;
+}
+.el-dialog{
+  min-width: 400px;
 }
 </style>

@@ -77,6 +77,7 @@
 import { selectAllVary } from '@/api/course-vary/selectAll.js'
 import { getHigherLevel } from '@/api/course-vary/getHigherLevel.js'
 import { updateVary } from '@/api/course-vary/updateVary.js'
+import { deleteVary } from '@/api/course-vary/deleteVary.js'
 export default {
   name: 'VaryManager',
   data () {
@@ -243,9 +244,25 @@ export default {
     },
 
     remove (node, data) {
-      this.$message({
-        type: 'info',
-        message: '功能模块暂未开放'
+      console.log(data)
+      this.$confirm('此操作将永久删除此类别, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let loading = this.$myLoading('删除中...')
+        deleteVary(data).then((result) => {
+          loading.close()
+          this.searchVarys()
+        }).catch((err) => {
+          loading.close()
+          console.log(err)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     },
 

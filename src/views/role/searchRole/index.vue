@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-21 17:02:43
+ * @LastEditTime: 2020-03-24 23:33:02
  -->
 <template>
   <d2-container>
@@ -280,7 +280,7 @@ export default {
         this.getAllPermision()
       } else {
         //  删除信息
-        this.$confirm('此操作将删除管理员, 是否继续?', '提示', {
+        this.$confirm('此操作将删除此角色, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

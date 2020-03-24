@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-09 20:34:30
+ * @LastEditTime: 2020-03-24 23:18:03
  -->
 <template>
     <d2-container>
@@ -113,11 +113,14 @@ export default {
       }
     },
     change () {
-      console.log(this.searchInfo.level)
+      this.formPermission.kid1 = ''
+      if (this.searchInfo.level === 1) {
+        return
+      }
       let data = {
         level: this.searchInfo.level
       }
-      getHigherLevel(data).then(res => {
+      getHigherLevel(data.level).then(res => {
         console.log(res)
         if (res.data != null) {
           this.vary = res.data
@@ -125,10 +128,10 @@ export default {
       }).catch(errs => {})
       if (this.searchInfo.level === 2) {
         this.levelText1 = '一级类别'
-        this.levelText2 = '请选择其属于的二级类别'
+        this.levelText2 = '请选择新添加类别上面的父级类别'
       } else {
         this.levelText1 = '二级类别'
-        this.levelText2 = '请选择其属于的二级类别'
+        this.levelText2 = '请选择其上面的父级类别'
       }
     }
   }
