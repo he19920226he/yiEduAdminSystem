@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2019-11-07 17:40:54
+ * @LastEditTime: 2020-03-25 14:15:20
  -->
 <template>
     <div class="user">
@@ -109,7 +109,7 @@ export default {
       }
     }
     var checkEmail = (rule, value, callback) => {
-      var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+      var reg = /^([a-zA-Z]|[0-9])(\w|-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
       if (!reg.test(value)) {
         callback(new Error('邮箱格式不对'))
       } else {

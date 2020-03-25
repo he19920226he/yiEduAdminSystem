@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-12-12 02:00:37
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-25 00:47:45
+ * @LastEditTime: 2020-03-25 14:34:09
  -->
 <!--
  * @Description:
@@ -394,6 +394,7 @@ export default {
           info: '确定修改'
         }
       },
+      courseDatas: [], // 获取的课程信息保存在这里，要来实现前端分页
       formVideo: {
         title: '',
         videoIntroduce: '',
@@ -515,14 +516,24 @@ export default {
       } else {
         this.showDatas.courseDatas = []
         if (Array.isArray(res.data)) {
-          this.showDatas.courseDatas = res.data
-          for (let i = 0; i < this.showDatas.courseDatas.length; i++) {
-            for (let key in this.showDatas.courseDatas[i]) {
-              if (this.showDatas.courseDatas[i][key] === null) {
-                this.showDatas.courseDatas[i][key] = '暂无信息'
+          // this.showDatas.courseDatas = res.data
+          //  从根据分页siez和当前页数从所有数据中获取对应数目的数据
+          let realShowDatas = []
+          for (let i = 0; i < this.searchInfo.size; i++) {
+            // 计算开始截取的位置
+            let cliNum = (this.searchInfo.indexPageNum - 1) * this.searchInfo.size
+            if (res.data[cliNum + i]) {
+              realShowDatas.push(res.data[cliNum + i])
+            }
+          }
+          for (let i = 0; i < realShowDatas.length; i++) {
+            for (let key in realShowDatas[i]) {
+              if (realShowDatas[i][key] === null) {
+                realShowDatas[i][key] = '暂无信息'
               }
             }
           }
+          this.showDatas.courseDatas = realShowDatas
         } else {
           this.showDatas.courseDatas.push(res.data)
         }
