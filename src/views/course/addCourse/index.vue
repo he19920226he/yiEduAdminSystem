@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-24 20:28:11
+ * @LastEditTime: 2020-03-25 15:34:09
  -->
 <template>
   <d2-container>
@@ -195,24 +195,8 @@
       <transition name="fade">
         <div v-show="stepActive===2" style="margin-top:20px;">
           <el-row :gutter="10">
-            <el-col :span="6" :offset="8">
-              <el-upload
-                class="upload-demo"
-                drag
-                :with-credentials="true"
-                :action="uploadUrl"
-                :on-success="handleVideoSuccess"
-                :before-upload="beforeUploadVideo"
-                :on-preview="showVideo"
-                :on-error="uploadError"
-              >
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">
-                  将试题文件拖到此处，或
-                  <em>点击上传</em>
-                </div>
-                <div class="el-upload__tip" slot="tip">支持上传文本文件，请确保不要上传文件格式正确，一次大小不不超过10M</div>
-              </el-upload>
+            <el-col :span="24" >
+              <h4 style="text-align:center;">试题功能模块暂未开放,可以直接保存进入下一步...</h4>
             </el-col>
           </el-row>
 

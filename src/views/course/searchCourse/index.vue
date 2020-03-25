@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-12-12 02:00:37
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-25 14:34:09
+ * @LastEditTime: 2020-03-25 15:18:03
  -->
 <!--
  * @Description:
@@ -230,6 +230,7 @@
                         drag
                         :data="videoInfo"
                         :with-credentials="true"
+                        :show-file-list="false"
                         :action="uploadUrl"
                         :on-success="handleVideoSuccess"
                         :before-upload="beforeUploadVideo"
@@ -247,15 +248,15 @@
               </el-col>
             </el-row>
             <!-- 视频上传进度条 -->
-            <el-row style="padding-right:190px;" v-if="isUpload">
+            <el-row style="padding-right:190px;margin:10px 0;" v-if="isUpload">
              <el-col :span="14" :offset="6" style="min-width:300px;">
 
-               <el-progress :percentage="uploadProgess"></el-progress>
+               <el-progress :text-inside="true" :stroke-width="15" :percentage="uploadProgess"></el-progress>
 
               </el-col>
 
             </el-row>
-            <el-row :gutter="10" style="padding-left:20px;">
+            <el-row :gutter="10" style="padding-left:20px;margin-top:10px;">
               <el-col :span="12" :offset="4" style="min-width:300px;">
                 <video v-if="videoSrc!==''" :src="videoSrc" id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='width:100%; height: auto;'>
                   您的浏览器不支持视频播放
@@ -637,12 +638,6 @@ export default {
     },
     // 监听视频播放过程错误，以及根据视频时长这一元数据来判断首次载入视频资源是否成功：主要是为了避免首次播放视频前网络连接突然断掉了
     videoError () {
-      if (!this.$refs.currentVideo.duration) {
-        this.$message({
-          type: 'error',
-          message: '视频加载错误，请检查网络后点击刷新按钮试试'
-        })
-      }
       this.$refs.currentVideo.addEventListener('error', () => {
         this.$message({
           type: 'error',
@@ -809,10 +804,12 @@ export default {
     },
     // 视频上传进度监听
     videoProgress (event, file, fileList) {
-      console.log(0)
+      this.isUpload = true
+      this.uploadProgess = Math.round(file.percentage)
     },
     // 上传成功后显
     handleVideoSuccess (res, file) {
+      this.isUpload = false
       this.videoSrc = URL.createObjectURL(file.raw)
       // 保存视频信息
       // let json = {
@@ -828,6 +825,7 @@ export default {
     },
     // 上传失败
     uploadError (err, file, fileList) {
+      this.isUpload = false
       console.log(err)
       this.$message.error('视频上传失败，请重新上传！')
     }
