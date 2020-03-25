@@ -76,6 +76,26 @@
 
 - 好好学习js(es6)、node、webpack、vue，再回过头来深入理解这个项目的业务框架
 
+#### console.log的封装使用
+> 由于他调试的时候习惯使用console.log，结果造成了控制台一堆打印信息，一方面不美观，影响性能，另一方面是容易泄露信息
+> 解决方案是一开始就自己封装console.log，全局引入，不使用的时候在对封装的方法进行修改
+```js
+export default function $Console(){
+  console.log.apply(console,arguments);
+}
+
+```
+更好的方式，利用环境变量控制
+```js
+function _console(data){
+  if(App.env == "production" || !window.console) return;
+  console.log.call(console, data);
+  return;
+};
+```
+
+> 还有一种解决方案是配置webpack，build后自动取消console.log
+
 
 
 ### 杂项
@@ -87,7 +107,6 @@
 6. 网络变化的监听：chrome12以上
 7. 未作移动端适配，鉴于element ui部分组件在移动端会被缩放到很小，做一点简单样式优化，主要是：限制在容器的最小宽度，使用min-width属性
 8. 视频上传添加进度管理控制，由于elemen ui 文件上传组件的on-progress事件在项目启用mock模拟请求数据的时候，无法触发，所以再项目不需要mock的时候把它移除掉
-ps:为了防止出现重大错误，我是重新创建一个测试分支，来进行下面的操作
 ```js
 npm remove mockjs --save
 删除 src/mock
@@ -137,7 +156,7 @@ if (process.env.VUE_APP_BUILD_MODE !== 'nomock') {
 > 视频dialog的关闭：仅暂停视频，不销毁当前载入的视频，这样一方面可以避免重复加载相同的视频，另一方面也是一种实现进度保存的简单方法，再次进入同一个视频可以从之前观看的位置开始
 
 ### 开发分支与master分支
-- 测试无误，合并到master分支后，再进行一些额外的代码优化和其他一些细节处理
+- 测试无误，合并到master分支后，再进行一些额外的代码优化和其他一些细节处理,比如master分支安装依赖包会自动删除console.log等控制台打印信息
 - 打包，自动部署到服务器。
 
 ### 部署相关
