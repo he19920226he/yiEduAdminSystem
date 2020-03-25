@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-11-06 11:06:15
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-24 23:33:53
+ * @LastEditTime: 2020-03-25 14:12:40
  -->
 <template>
   <d2-container>
@@ -123,7 +123,7 @@
 import getMenuIcons from '../../../menu/menuIcon'
 import util from '@/libs/util.js'
 import { LoginAdmin } from '@/api/sys.login.js'
-import { selectAll, selectPermisionById } from '@/api/permission/searchPermision'
+import { selectAll } from '@/api/permission/searchPermision'
 import { deletePermision } from '@/api/permission/deletePermision.js'
 import { updatePermision } from '@/api/permission/updatePermision.js'
 export default {

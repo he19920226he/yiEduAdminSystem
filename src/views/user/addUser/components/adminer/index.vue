@@ -80,7 +80,7 @@ export default {
   methods: {
     reset () {
       for (let key in this.formAdminer) {
-        if (key !== 'roleId' ) {
+        if (key !== 'roleId') {
           this.formAdminer[key] = ''
         }
       }
