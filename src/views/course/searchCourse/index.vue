@@ -4,7 +4,7 @@
  * @Author: lxw
  * @Date: 2019-12-12 02:00:37
  * @LastEditors: lxw
- * @LastEditTime: 2020-03-25 15:18:03
+ * @LastEditTime: 2020-03-25 16:36:16
  -->
 <!--
  * @Description:
@@ -628,7 +628,7 @@ export default {
       this.dialogFormVisible1 = true
       this.operateVideInfo = '播放视频'
       this.isType = '播放视频'
-      this.currentPlayVideoSrc = item.vurl
+      this.currentPlayVideoSrc = `http://47.103.223.248:8095/YIedu/${item.vurl}`
       //  网络原因，视频第一次载入的时候；这里preload设置为meta，只预先加载元素数据，但是这里判断一下网络状态还是有必要的
 
       // 监听视频播放错误状态
